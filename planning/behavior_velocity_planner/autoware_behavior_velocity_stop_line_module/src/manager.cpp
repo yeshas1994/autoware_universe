@@ -94,7 +94,8 @@ StopLineModuleManager::getModuleExpiredFunction(
     getStopLineIdSetOnPath(path, planner_data_->route_handler_->getLaneletMapPtr());
 
   return [stop_line_id_set](const std::shared_ptr<SceneModuleInterface> & scene_module) {
-    return stop_line_id_set.count(scene_module->getModuleId()) == 0;
+    // return stop_line_id_set.count(scene_module->getModuleId()) == 0;
+    return false;
   };
 }
 

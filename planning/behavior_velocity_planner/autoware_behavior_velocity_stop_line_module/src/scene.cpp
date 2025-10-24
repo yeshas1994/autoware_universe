@@ -51,7 +51,12 @@ bool StopLineModule::modifyPathVelocity(PathWithLaneId * path)
   auto [ego_s, stop_point] =
     getEgoAndStopPoint(*trajectory, planner_data_->current_odometry->pose, state_);
 
-  if (!stop_point) {
+  // if (!stop_point) {
+  if (!stop_point || stop_point < 0 || state_ == State::START) {
+    if(!planner_data_->isVehicleStopped() && stop_point < 0) {
+      std::cout << "START -> APPROACH" << std::endl;
+      state_ = State::APPROACH;
+    }
     return true;
   }
 
@@ -79,6 +84,7 @@ std::pair<double, std::optional<double>> StopLineModule::getEgoAndStopPoint(
   std::optional<double> stop_point_s;
 
   switch (state) {
+    case State::START:
     case State::APPROACH: {
       const double base_link2front = planner_data_->vehicle_info_.max_longitudinal_offset_m;
       const LineString2d stop_line = planning_utils::extendLine(
@@ -98,9 +104,9 @@ std::pair<double, std::optional<double>> StopLineModule::getEgoAndStopPoint(
         *trajectory_stop_line_intersection -
         (base_link2front + planner_param_.stop_margin);  // consider vehicle length and stop margin
 
-      if (*stop_point_s < 0.0) {
-        stop_point_s = std::nullopt;
-      }
+      // if (*stop_point_s < 0.0) {
+      //   stop_point_s = std::nullopt;
+      // }
       break;
     }
 
@@ -109,10 +115,10 @@ std::pair<double, std::optional<double>> StopLineModule::getEgoAndStopPoint(
       break;
     }
 
-    case State::START: {
-      stop_point_s = std::nullopt;
-      break;
-    }
+    // case State::START: {
+    //   stop_point_s = std::nullopt;
+    //   break;
+    // }
   }
   return {ego_s, stop_point_s};
 }
