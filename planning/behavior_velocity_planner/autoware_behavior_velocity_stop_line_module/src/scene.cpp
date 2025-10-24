@@ -54,7 +54,6 @@ bool StopLineModule::modifyPathVelocity(PathWithLaneId * path)
   // if (!stop_point) {
   if (!stop_point || stop_point < 0 || state_ == State::START) {
     if(!planner_data_->isVehicleStopped() && stop_point < 0) {
-      std::cout << "START -> APPROACH" << std::endl;
       state_ = State::APPROACH;
     }
     return true;
