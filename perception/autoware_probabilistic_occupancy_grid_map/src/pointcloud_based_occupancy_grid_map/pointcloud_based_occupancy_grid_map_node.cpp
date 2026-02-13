@@ -318,7 +318,7 @@ void PointcloudBasedOccupancyGridMapNode::onPointcloudWithObstacleAndRaw()
       *occupancy_grid_map_updater_ptr_));
   }
 
-  if (debug_publisher_ptr_ && stop_watch_ptr_) {
+  if (stop_watch_ptr_) {
     const double cyclic_time_ms = stop_watch_ptr_->toc("cyclic_time", true);
     const double processing_time_ms = stop_watch_ptr_->toc("processing_time", true);
     const double pipeline_latency_ms =
@@ -326,12 +326,15 @@ void PointcloudBasedOccupancyGridMapNode::onPointcloudWithObstacleAndRaw()
         std::chrono::nanoseconds(
           (this->get_clock()->now() - raw_pointcloud_.header.stamp).nanoseconds()))
         .count();
-    debug_publisher_ptr_->publish<autoware_internal_debug_msgs::msg::Float64Stamped>(
-      "debug/cyclic_time_ms", cyclic_time_ms);
-    debug_publisher_ptr_->publish<autoware_internal_debug_msgs::msg::Float64Stamped>(
-      "debug/processing_time_ms", processing_time_ms);
-    debug_publisher_ptr_->publish<autoware_internal_debug_msgs::msg::Float64Stamped>(
-      "debug/pipeline_latency_ms", pipeline_latency_ms);
+
+    if (debug_publisher_ptr_) {
+      debug_publisher_ptr_->publish<autoware_internal_debug_msgs::msg::Float64Stamped>(
+        "debug/cyclic_time_ms", cyclic_time_ms);
+      debug_publisher_ptr_->publish<autoware_internal_debug_msgs::msg::Float64Stamped>(
+        "debug/processing_time_ms", processing_time_ms);
+      debug_publisher_ptr_->publish<autoware_internal_debug_msgs::msg::Float64Stamped>(
+        "debug/pipeline_latency_ms", pipeline_latency_ms);
+    }
 
     checkProcessingTime(processing_time_ms);
   }
